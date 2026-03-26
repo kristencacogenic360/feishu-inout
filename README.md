@@ -133,12 +133,20 @@ http://localhost:9876/callback
 
 ### 4. 设置环境变量
 
-自行将凭证写入 shell 配置（**请勿将 App Secret 发送给 AI**）：
+自行设置凭证（**请勿将 App Secret 发送给 AI**）：
 
+**macOS / Linux：**
 ```bash
 echo 'export FEISHU_APP_ID="你的AppID"' >> ~/.zshrc
 echo 'export FEISHU_APP_SECRET="你的AppSecret"' >> ~/.zshrc
 source ~/.zshrc
+```
+
+**Windows (PowerShell)：**
+```powershell
+[System.Environment]::SetEnvironmentVariable('FEISHU_APP_ID', '你的AppID', 'User')
+[System.Environment]::SetEnvironmentVariable('FEISHU_APP_SECRET', '你的AppSecret', 'User')
+# 设置后重启终端
 ```
 
 ### 5. 登录授权

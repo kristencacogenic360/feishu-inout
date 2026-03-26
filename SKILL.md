@@ -101,15 +101,25 @@ http://localhost:9876/callback
 
 指导用户自行将凭证写入 shell 配置文件。**不要让用户把 App Secret 发给你，也不要在对话中输出或回显凭证值。**
 
-告诉用户执行以下命令（自行替换实际值）：
+根据用户操作系统，指导对应的设置方式：
 
+**macOS / Linux：**
 ```bash
 echo 'export FEISHU_APP_ID="你的AppID"' >> ~/.zshrc
 echo 'export FEISHU_APP_SECRET="你的AppSecret"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
-设置完成后，通过 `echo $FEISHU_APP_ID` 验证是否生效（仅验证 App ID，不要输出 Secret）。
+**Windows (PowerShell)：**
+```powershell
+[System.Environment]::SetEnvironmentVariable('FEISHU_APP_ID', '你的AppID', 'User')
+[System.Environment]::SetEnvironmentVariable('FEISHU_APP_SECRET', '你的AppSecret', 'User')
+```
+设置后需重启终端或 IDE 使环境变量生效。
+
+设置完成后，验证是否生效（仅验证 App ID，不要输出 Secret）：
+- macOS/Linux: `echo $FEISHU_APP_ID`
+- Windows: `echo $env:FEISHU_APP_ID`
 
 ### 第 5 步：OAuth 登录获取 UAT
 
