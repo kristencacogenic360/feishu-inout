@@ -37,7 +37,13 @@ description: |
 
 ### 第 2 步：开通 API 权限
 
-进入应用 → 左侧菜单 **权限管理** → 点击 **开通权限**，搜索并开通以下权限：
+进入应用 → 左侧菜单 **权限管理** → 点击 **批量导入/导出权限**，粘贴以下全部权限一键导入：
+
+```
+docx:document:readonly,search:docs:read,wiki:wiki:readonly,im:chat:read,task:task:read,docx:document,docx:document:create,docx:document:write_only,docs:document.media:upload,docs:document.media:download,wiki:node:read,wiki:node:create,docs:document.comment:read,docs:document.comment:create,contact:user:search,contact:contact.base:readonly,contact:user.base:readonly,board:whiteboard:node:read,drive:drive
+```
+
+或者逐个搜索开通以下权限：
 
 **必须开通（文档读写核心权限）：**
 
