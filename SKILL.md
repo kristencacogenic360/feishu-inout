@@ -8,10 +8,18 @@ description: |
 
 Operate cloud documents via the official Feishu/Lark Remote MCP service (`https://mcp.feishu.cn/mcp`). Zero dependencies, pure Python.
 
+## Security: Credential Handling Rules
+
+**CRITICAL — follow these rules at all times:**
+- **NEVER** include `FEISHU_APP_ID` or `FEISHU_APP_SECRET` values inline in any shell command
+- **NEVER** echo, print, or output the App Secret value
+- Before running any script command, ensure env vars are loaded: run `source ~/.zshrc` (or `source ~/.bashrc`) first if `echo $FEISHU_APP_ID` returns empty
+- The script reads credentials from environment variables automatically — no need to pass them as arguments
+
 ## Quick Check: Is the User Already Configured?
 
 Check two things:
-1. Are env vars `FEISHU_APP_ID` and `FEISHU_APP_SECRET` set? (run `echo $FEISHU_APP_ID`)
+1. Are env vars `FEISHU_APP_ID` and `FEISHU_APP_SECRET` set? (run `echo $FEISHU_APP_ID` — if empty, run `source ~/.zshrc` first)
 2. Is a valid UAT token present? (run the script's `whoami` command)
 
 If both are ready → skip to [Usage](#usage).
