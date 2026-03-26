@@ -4,9 +4,9 @@
 
 # feishu-inout
 
-**One command to connect your AI coding agent to Lark (Feishu) documents**
+**One command to connect your AI coding agent to Lark (Feishu) docs & messaging**
 
-Claude Code / Cursor / Codex / OpenCode / OpenClaw — instant Lark cloud doc access
+Claude Code / Cursor / Codex / OpenCode / OpenClaw — read, write, and chat on Lark
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.6+](https://img.shields.io/badge/Python-3.6+-green.svg)](https://python.org)

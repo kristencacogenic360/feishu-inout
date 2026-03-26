@@ -4,9 +4,9 @@
 
 # feishu-inout
 
-**一行命令，让 AI 编程助手读写你的飞书文档**
+**一行命令，让 AI 编程助手读写飞书文档和消息**
 
-Claude Code / Cursor / Codex / OpenCode / OpenClaw — 一键接入飞书云文档
+Claude Code / Cursor / Codex / OpenCode / OpenClaw — 文档 + 消息，一个 skill 全搞定
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.6+](https://img.shields.io/badge/Python-3.6+-green.svg)](https://python.org)
