@@ -37,17 +37,31 @@ Connect any AI coding agent to your Feishu/Lark documents in one command.
 <table>
 <tr>
 <td align="center"><b>Claude Code</b></td>
-<td align="center"><b>Codex</b></td>
 <td align="center"><b>Cursor</b></td>
-<td align="center"><b>OpenCode</b></td>
-<td align="center"><b>OpenClaw</b></td>
-</tr>
-<tr>
+<td align="center"><b>Codex</b></td>
 <td align="center"><b>Gemini CLI</b></td>
 <td align="center"><b>GitHub Copilot</b></td>
+</tr>
+<tr>
 <td align="center"><b>Amp</b></td>
-<td align="center"><b>Droid</b></td>
+<td align="center"><b>Windsurf</b></td>
+<td align="center"><b>Cline</b></td>
+<td align="center"><b>Roo Code</b></td>
+<td align="center"><b>OpenCode</b></td>
+</tr>
+<tr>
+<td align="center"><b>Clawd</b></td>
+<td align="center"><b>Trae</b></td>
+<td align="center"><b>Kiro</b></td>
+<td align="center"><b>Kilo</b></td>
+<td align="center"><b>Goose</b></td>
+</tr>
+<tr>
+<td align="center"><b>Factory.ai</b></td>
+<td align="center"><b>Antigravity</b></td>
 <td align="center"><b>...</b></td>
+<td align="center"></td>
+<td align="center"></td>
 </tr>
 </table>
 
