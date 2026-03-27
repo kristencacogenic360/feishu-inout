@@ -1,12 +1,12 @@
 ---
 name: feishu-inout
 description: |
-  Read/write Feishu/Lark cloud documents and send/search messages via the official Remote MCP service. Works with Claude Code, Cursor, Codex, OpenCode, OpenClaw, and other AI coding agents. Trigger this skill when the user mentions Feishu, Lark, cloud docs, read/search/create documents, messaging, sending messages, or provides a Feishu/Lark document URL.
+  Read/write Feishu/Lark cloud documents, send/search messages, manage calendar/meetings, operate bitable (multi-dimensional tables), and manage group chats via the official Remote MCP service and Open APIs. Works with Claude Code, Cursor, Codex, OpenCode, OpenClaw, and other AI coding agents. Trigger this skill when the user mentions Feishu, Lark, cloud docs, read/search/create documents, messaging, sending messages, meeting, calendar, bitable, multi-dimensional table, 多维表格, 日历, 会议, create group, 创建群, or provides a Feishu/Lark document URL.
 ---
 
-# Feishu InOut - Feishu/Lark Document & Messaging Operations
+# Feishu InOut - Feishu/Lark Document, Messaging, Calendar, Bitable & Group Operations
 
-Operate cloud documents and send/search messages via the official Feishu/Lark Remote MCP service (`https://mcp.feishu.cn/mcp`). Zero dependencies, pure Python.
+Operate cloud documents, send/search messages, manage calendar events and meetings, work with bitable (multi-dimensional tables), and manage group chats via the official Feishu/Lark Remote MCP service (`https://mcp.feishu.cn/mcp`) and Open APIs. Zero dependencies, pure Python.
 
 ## Security: Credential Handling Rules
 
@@ -34,7 +34,7 @@ Before starting, ask the user:
 > Which features do you need?
 > 1. **Read-only** (search, read, browse) — minimal permissions, fastest setup
 > 2. **Read & write** (+ create, edit, comments) — recommended, covers most scenarios
-> 3. **All features** (+ send/search messages in groups/DMs) — messaging uses MCP with user identity (UAT), bot capability is optional
+> 3. **All features** (+ send/search messages, calendar/meetings, bitable, group management) — messaging uses MCP with user identity (UAT), calendar/bitable/groups use Open API
 
 Based on the user's choice, show the matching permission string in Step 2. Note that Step 6 (bot capability) is optional for all choices.
 
@@ -52,7 +52,7 @@ docx:document:readonly,search:docs:read,wiki:wiki:readonly,im:chat:read,task:tas
 
 Choice 3 (all features):
 ```
-docx:document:readonly,search:docs:read,wiki:wiki:readonly,im:chat:read,task:task:read,docx:document,docx:document:create,docx:document:write_only,docs:document.media:upload,docs:document.media:download,wiki:node:read,wiki:node:create,docs:document.comment:read,docs:document.comment:create,contact:user:search,contact:contact.base:readonly,contact:user.base:readonly,board:whiteboard:node:read,drive:drive,im:message,im:message:send_as_bot,im:chat,search:message,im:message.send_as_user,im:message.p2p_msg:get_as_user
+docx:document:readonly,search:docs:read,wiki:wiki:readonly,im:chat:read,task:task:read,docx:document,docx:document:create,docx:document:write_only,docs:document.media:upload,docs:document.media:download,wiki:node:read,wiki:node:create,docs:document.comment:read,docs:document.comment:create,contact:user:search,contact:contact.base:readonly,contact:user.base:readonly,board:whiteboard:node:read,drive:drive,im:message,im:message:send_as_bot,im:chat,search:message,im:message.send_as_user,im:message.p2p_msg:get_as_user,calendar:calendar:readonly,calendar:calendar,bitable:app:readonly,bitable:app,im:chat:create
 ```
 
 Guide the user to paste the string in the open platform → Permission Management → **Batch Import/Export**.
@@ -132,7 +132,27 @@ Or enable individually:
 | `im:message.send_as_user` | Send as user | User (needs approval) |
 | `im:message.p2p_msg:get_as_user` | Read DM history | User (needs approval) |
 
-**Note**: Messaging permissions only need to be enabled if the user chose "All features". Messaging goes through the official MCP using UAT (user identity) -- bot capability is optional, not required.
+**Calendar/Meeting (create-event, list-events):**
+
+| Scope | Description | Auth Type |
+|-------|-------------|-----------|
+| `calendar:calendar:readonly` | View calendars | User |
+| `calendar:calendar` | Manage calendars & events | User |
+
+**Bitable / Multi-dimensional Table (list-tables, list-records, create-record, update-record):**
+
+| Scope | Description | Auth Type |
+|-------|-------------|-----------|
+| `bitable:app:readonly` | View bitable data | User |
+| `bitable:app` | Manage bitable data | User |
+
+**Group Management (create-group, add-members, list-groups):**
+
+| Scope | Description | Auth Type |
+|-------|-------------|-----------|
+| `im:chat:create` | Create groups | App |
+
+**Note**: Messaging, calendar, bitable, and group management permissions only need to be enabled if the user chose "All features". Messaging goes through the official MCP using UAT (user identity) -- bot capability is optional, not required. Calendar, bitable, and group management use the Open API.
 
 After enabling, "User" type permissions showing "consistent with user scope" is normal. "App" type showing "-" is also normal.
 
@@ -301,6 +321,21 @@ python3 $S get-msgs-user <open_id> [time] [count]  # Get DM history
 python3 $S search-msgs <keyword> [time]            # Search messages across chats
 python3 $S get-thread <thread_id>                  # Get thread replies
 
+# Calendar / Meeting (via Open API)
+python3 $S create-event <title> <start> <end> [attendees_json]  # Create event with video meeting
+python3 $S list-events [date]                                    # List events (default: today)
+
+# Bitable / Multi-dimensional Table (via Open API)
+python3 $S list-tables <app_token>                               # List tables in a bitable
+python3 $S list-records <app_token> <table_id> [page_size]       # List records
+python3 $S create-record <app_token> <table_id> '<fields_json>'  # Create a record
+python3 $S update-record <app_token> <table_id> <record_id> '<fields_json>'  # Update a record
+
+# Group Management (via Open API, uses TAT/bot identity)
+python3 $S create-group <name> [members_json]                    # Create a group chat
+python3 $S add-members <chat_id> '<members_json>'                # Add members to group
+python3 $S list-groups                                           # List groups bot is in
+
 # Advanced (raw JSON call to any tool)
 python3 $S call <toolName> '<jsonArgs>'
 python3 $S update-doc '{"doc_id":"xxx","mode":"replace_range","selection_by_title":"## Section","markdown":"New content"}'
@@ -383,6 +418,22 @@ Messages go through the official Feishu/Lark MCP using UAT (user identity) -- no
 - Emoji support: `[SMILE]`, `[THUMBSUP]`, etc.
 
 **Time filters** for `get-msgs`, `get-msgs-user`, `search-msgs`: `today`, `yesterday`, `this_week`, `last_week`, `this_month`, `last_month`, `last_30_minutes`, `last_3_days`, etc.
+
+### Create a Meeting
+1. Run `create-event <title> <start> <end>` -- auto-creates a Feishu/Lark video meeting
+2. To invite attendees: `create-event "Sprint Review" "2026-03-28T14:00+08:00" "2026-03-28T15:00+08:00" '["ou_xxx","ou_yyy"]'`
+3. Use `search-user` first to get attendees' open_ids
+
+### Work with Bitable
+1. Extract app_token from bitable URL: `https://xxx.feishu.cn/base/XXX` -- app_token = XXX
+2. Run `list-tables <app_token>` to see available tables
+3. Run `list-records <app_token> <table_id>` to read data
+4. Run `create-record` or `update-record` to write data
+
+### Create Group and Add Members
+1. Run `create-group "Project Alpha" '["ou_xxx","ou_yyy"]'` to create with initial members
+2. Or `create-group "Project Alpha"` then `add-members <chat_id> '["ou_xxx"]'`
+3. Group management uses bot identity (TAT), requires bot capability enabled
 
 ---
 

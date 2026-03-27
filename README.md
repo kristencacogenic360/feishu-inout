@@ -4,9 +4,9 @@
 
 # feishu-inout
 
-**One command to connect your AI coding agent to Lark (Feishu) docs & messaging**
+**One command to connect your AI coding agent to Lark (Feishu) docs, messaging, calendar & more**
 
-Claude Code / Cursor / Codex / OpenCode / OpenClaw — read, write, and chat on Lark
+Claude Code / Cursor / Codex / OpenCode / OpenClaw — docs, messaging, calendar, bitable on Lark
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.6+](https://img.shields.io/badge/Python-3.6+-green.svg)](https://python.org)
@@ -17,7 +17,7 @@ Claude Code / Cursor / Codex / OpenCode / OpenClaw — read, write, and chat on 
 
 ---
 
-> **Search, read, create, edit, append, replace, insert, delete, send/read/search messages** — do everything with Lark docs and messaging from your AI coding agent.
+> **Search, read, create, edit, append, replace, insert, delete, send/read/search messages, calendar, bitable** — do everything with Lark docs, messaging, calendar, and bitable from your AI coding agent.
 >
 > Built on Lark's official Remote MCP service. Zero dependencies, single file, works out of the box.
 
@@ -33,6 +33,9 @@ Claude Code / Cursor / Codex / OpenCode / OpenClaw — read, write, and chat on 
 - **File Access** — download images, attachments, whiteboard content
 - **My Library** — browse personal docs without IDs, recursive wiki exploration
 - **Paginated Reading** — offset + limit for large documents
+- **Calendar & Meetings** — create events with auto video meeting, invite attendees, view today's schedule
+- **Bitable (Spreadsheet)** — read, create, update records in multi-dimensional tables
+- **Group Management** — create groups, add members, list groups
 - **Auto Token Refresh** — OAuth tokens refresh automatically, login once and forget
 
 ## Who Is This For?
@@ -96,7 +99,7 @@ Go to [Lark Open Platform](https://open.larksuite.com/app) ([China: open.feishu.
 Go to your app → Permission Management → **Batch Import/Export** and paste:
 
 ```
-docx:document:readonly,search:docs:read,wiki:wiki:readonly,im:chat:read,task:task:read,docx:document,docx:document:create,docx:document:write_only,docs:document.media:upload,docs:document.media:download,wiki:node:read,wiki:node:create,docs:document.comment:read,docs:document.comment:create,contact:user:search,contact:contact.base:readonly,contact:user.base:readonly,board:whiteboard:node:read,drive:drive,im:message,im:message:send_as_bot,im:chat,search:message,im:message.send_as_user,im:message.p2p_msg:get_as_user
+docx:document:readonly,search:docs:read,wiki:wiki:readonly,im:chat:read,task:task:read,docx:document,docx:document:create,docx:document:write_only,docs:document.media:upload,docs:document.media:download,wiki:node:read,wiki:node:create,docs:document.comment:read,docs:document.comment:create,contact:user:search,contact:contact.base:readonly,contact:user.base:readonly,board:whiteboard:node:read,drive:drive,im:message,im:message:send_as_bot,im:chat,search:message,im:message.send_as_user,im:message.p2p_msg:get_as_user,calendar:calendar:readonly,calendar:calendar,bitable:app:readonly,bitable:app,im:chat:create
 ```
 
 <details>
@@ -146,6 +149,26 @@ docx:document:readonly,search:docs:read,wiki:wiki:readonly,im:chat:read,task:tas
 | `search:message` | Search messages |
 | `im:message.send_as_user` | Send messages as user |
 | `im:message.p2p_msg:get_as_user` | Read DM messages as user |
+
+#### Calendar (optional)
+
+| Scope | Description |
+|-------|-------------|
+| `calendar:calendar:readonly` | View calendar events |
+| `calendar:calendar` | Manage calendar events |
+
+#### Bitable (optional)
+
+| Scope | Description |
+|-------|-------------|
+| `bitable:app:readonly` | View bitable records |
+| `bitable:app` | Manage bitable records |
+
+#### Group Management (optional)
+
+| Scope | Description |
+|-------|-------------|
+| `im:chat:create` | Create group chats |
 
 </details>
 
@@ -282,6 +305,39 @@ AI:  Document "Q2 Product Roadmap" shared to "Product Team" group.
 
 > Messages support Markdown formatting, @mentions via `<mention-user id="openId"/>`, @all via `<mention-user id="all"/>`, and emoji like `[SMILE]`.
 
+### Calendar & Meetings
+
+```
+You: Schedule a sprint review tomorrow 2-3pm, invite David and Sarah
+
+AI:  Event created with Lark video meeting!
+     Link: https://meetings.feishu.cn/...
+     Invited: David, Sarah
+```
+
+```
+You: What meetings do I have today?
+
+AI:  3 events today:
+     1. 10:00-11:00 — Daily standup
+     2. 14:00-15:00 — Sprint review
+     3. 16:00-16:30 — 1:1 with Mike
+```
+
+### Bitable
+
+```
+You: Show me the records in this bitable https://xxx.feishu.cn/base/ABC123
+
+AI:  Found table "Task Tracker" with 15 records...
+```
+
+```
+You: Add a new row: task="Fix login bug", status="In Progress", assignee="David"
+
+AI:  Record created.
+```
+
 ### More Scenarios
 
 ```
@@ -322,6 +378,21 @@ python3 $S read-messages oc_xxx --time today                     # Read today's 
 python3 $S read-messages ou_xxx --time last_3_days               # Read recent DMs
 python3 $S search-messages "deployment"                          # Search messages
 python3 $S reply-message om_xxx "thanks!"                        # Reply to a message
+
+# Calendar
+python3 $S list-events                                           # Today's events
+python3 $S create-event "Sprint Review" "2026-03-27T14:00" "2026-03-27T15:00"  # Create event
+python3 $S create-event "Demo" "2026-03-28T10:00" "2026-03-28T11:00" --vc     # With video meeting
+
+# Bitable
+python3 $S list-bitable-records appToken tableId                 # List records
+python3 $S create-bitable-record appToken tableId '{"Task":"Fix bug"}'  # Create record
+python3 $S update-bitable-record appToken tableId recordId '{"Status":"Done"}'  # Update record
+
+# Group Management
+python3 $S create-group "Project Team"                           # Create group
+python3 $S add-group-members oc_xxx ou_xxx1,ou_xxx2              # Add members
+python3 $S list-group-members oc_xxx                             # List members
 ```
 
 </details>
@@ -329,15 +400,15 @@ python3 $S reply-message om_xxx "thanks!"                        # Reply to a me
 ## How It Works
 
 ```
-                                                    ┌─► Lark Cloud Docs
-AI Agent ──► feishu_mcp.py ──► mcp.feishu.cn/mcp ──┤
-               │                    (Official MCP)  └─► Lark Messaging
-               ├─ Auto TAT/UAT auth
-               ├─ JSON-RPC 2.0
-               └─ Single file, zero deps
+                                    ┌─► Lark Cloud Docs
+AI Agent ──► feishu_mcp.py ──► ────┼─► Lark Messaging (MCP)
+               │                    ├─► Calendar & Meetings (API)
+               ├─ Official MCP      ├─► Bitable Tables (API)
+               ├─ + Open API        └─► Group Management (API)
+               └─ Zero deps
 ```
 
-Calls Lark's official Remote MCP service directly for both documents and messaging. No local MCP server, no Node.js, no bot required — one Python script handles everything.
+Calls Lark's official Remote MCP service for documents and messaging, plus Open API for calendar, bitable, and group management. No local MCP server, no Node.js, no bot required — one Python script handles everything.
 
 ## FAQ
 

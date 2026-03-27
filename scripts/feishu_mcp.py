@@ -2,7 +2,8 @@
 """Feishu Remote MCP Client - calls https://mcp.feishu.cn/mcp via JSON-RPC 2.0
 Supports both TAT (app identity) and UAT (user identity) authentication."""
 
-import json, os, sys, urllib.request, urllib.error, webbrowser, time
+import json, os, sys, urllib.request, urllib.error, webbrowser, time, re
+from datetime import datetime, timezone, timedelta
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 
@@ -133,7 +134,7 @@ def exchange_code_for_uat(code):
 def oauth_login():
     """Start OAuth2 flow: open browser, catch callback, exchange for UAT."""
     app_id, _ = get_app_id_secret()
-    scopes = "docx:document:readonly search:docs:read wiki:wiki:readonly im:chat:read task:task:read docx:document docx:document:create docx:document:write_only docs:document.media:upload docs:document.media:download wiki:node:read wiki:node:create docs:document.comment:read docs:document.comment:create contact:user:search contact:contact.base:readonly contact:user.base:readonly board:whiteboard:node:read drive:drive im:message:send_as_bot im:message im:chat search:message im:message.send_as_user im:message.p2p_msg:get_as_user"
+    scopes = "docx:document:readonly search:docs:read wiki:wiki:readonly im:chat:read task:task:read docx:document docx:document:create docx:document:write_only docs:document.media:upload docs:document.media:download wiki:node:read wiki:node:create docs:document.comment:read docs:document.comment:create contact:user:search contact:contact.base:readonly contact:user.base:readonly board:whiteboard:node:read drive:drive im:message:send_as_bot im:message im:chat search:message im:message.send_as_user im:message.p2p_msg:get_as_user im:message.group_msg:get_as_user"
     auth_url = f"{AUTH_URL}?app_id={app_id}&redirect_uri={REDIRECT_URI}&state=feishu_inout&scope={scopes}"
 
     captured = {}
@@ -212,6 +213,244 @@ def api_call(endpoint, data=None, method="POST", token=None):
             return json.loads(resp.read().decode())
     except urllib.error.HTTPError as e:
         return json.loads(e.read().decode())
+
+
+def get_uat_token():
+    """Load UAT access_token or exit with error."""
+    uat_data = load_uat()
+    if not uat_data or not uat_data.get("access_token"):
+        print("Error: UAT required. Run 'login' first.", file=sys.stderr)
+        sys.exit(1)
+    return uat_data["access_token"]
+
+
+def parse_timestamp(value):
+    """Parse a time string to unix timestamp string.
+
+    Accepts:
+    - Unix timestamp (digits only)
+    - ISO 8601: "2026-03-27T14:00:00+08:00" or "2026-03-27T14:00"
+    - Date only: "2026-03-27" (returns 00:00 in local timezone)
+    - "today" (returns 00:00 today in local timezone)
+    """
+    if value is None:
+        return None
+    value = value.strip()
+    if value.isdigit():
+        return value
+    # "today" keyword
+    if value.lower() == "today":
+        now = datetime.now()
+        start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        return str(int(start.timestamp()))
+    # Date only: "2026-03-27"
+    if re.match(r'^\d{4}-\d{2}-\d{2}$', value):
+        dt = datetime.strptime(value, "%Y-%m-%d")
+        return str(int(dt.timestamp()))
+    # ISO 8601 with timezone: "2026-03-27T14:00:00+08:00"
+    # Try various ISO formats
+    for fmt in ("%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M%z", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M"):
+        try:
+            dt = datetime.strptime(value, fmt)
+            return str(int(dt.timestamp()))
+        except ValueError:
+            continue
+    # Last resort: try parsing with fromisoformat (Python 3.7+)
+    try:
+        dt = datetime.fromisoformat(value)
+        return str(int(dt.timestamp()))
+    except (ValueError, AttributeError):
+        pass
+    print(f"Error: cannot parse timestamp '{value}'", file=sys.stderr)
+    sys.exit(1)
+
+
+def parse_date_range(date_str):
+    """Parse a date string to (start_ts, end_ts) unix timestamp strings for a full day."""
+    if date_str is None or date_str.lower() == "today":
+        now = datetime.now()
+        start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    elif re.match(r'^\d{4}-\d{2}-\d{2}$', date_str):
+        start = datetime.strptime(date_str, "%Y-%m-%d")
+    else:
+        print(f"Error: invalid date '{date_str}'. Use YYYY-MM-DD or 'today'.", file=sys.stderr)
+        sys.exit(1)
+    end = start.replace(hour=23, minute=59, second=59)
+    return str(int(start.timestamp())), str(int(end.timestamp()))
+
+
+def get_primary_calendar_id(uat):
+    """Get the primary calendar ID for the current user."""
+    resp = api_call("calendar/v4/calendars/primary", method="GET", token=uat)
+    if resp.get("code") != 0:
+        print(f"Error getting primary calendar: {resp.get('msg', resp)}", file=sys.stderr)
+        sys.exit(1)
+    return resp["data"]["calendars"][0]["calendar"]["calendar_id"]
+
+
+# --- Calendar / Meeting ---
+
+def cmd_create_event(args):
+    """create-event <title> <start> <end> [attendees_json]"""
+    if len(args) < 3:
+        print("Usage: create-event <title> <start_time> <end_time> [attendees_json]", file=sys.stderr)
+        sys.exit(1)
+    title = args[0]
+    start_ts = parse_timestamp(args[1])
+    end_ts = parse_timestamp(args[2])
+    attendees_json = args[3] if len(args) >= 4 else None
+
+    uat = get_uat_token()
+    calendar_id = get_primary_calendar_id(uat)
+
+    event_body = {
+        "summary": title,
+        "start_time": {"timestamp": start_ts},
+        "end_time": {"timestamp": end_ts},
+        "vchat": {"vc_type": "vc"},
+    }
+    resp = api_call(f"calendar/v4/calendars/{calendar_id}/events", data=event_body, token=uat)
+    if resp.get("code") != 0:
+        print(f"Error creating event: {resp.get('msg', resp)}", file=sys.stderr)
+        return resp
+
+    event = resp.get("data", {}).get("event", {})
+    event_id = event.get("event_id")
+    print(f"Event created: {event_id}", file=sys.stderr)
+
+    # Add attendees if provided
+    if attendees_json and event_id:
+        try:
+            attendee_ids = json.loads(attendees_json)
+            attendees = [{"type": "user", "user_id": uid} for uid in attendee_ids]
+            att_resp = api_call(
+                f"calendar/v4/calendars/{calendar_id}/events/{event_id}/attendees?user_id_type=open_id",
+                data={"attendees": attendees},
+                token=uat,
+            )
+            if att_resp.get("code") != 0:
+                print(f"Warning: failed to add attendees: {att_resp.get('msg', att_resp)}", file=sys.stderr)
+            else:
+                print(f"Added {len(attendee_ids)} attendee(s)", file=sys.stderr)
+        except json.JSONDecodeError:
+            print(f"Warning: invalid attendees JSON: {attendees_json}", file=sys.stderr)
+
+    return resp
+
+
+def cmd_list_events(args):
+    """list-events [date]"""
+    date_str = args[0] if len(args) >= 1 else "today"
+    start_ts, end_ts = parse_date_range(date_str)
+
+    uat = get_uat_token()
+    calendar_id = get_primary_calendar_id(uat)
+
+    resp = api_call(
+        f"calendar/v4/calendars/{calendar_id}/events?start_time={start_ts}&end_time={end_ts}",
+        method="GET",
+        token=uat,
+    )
+    return resp
+
+
+# --- Bitable (Multi-dimensional Table) ---
+
+def cmd_list_tables(args):
+    """list-tables <app_token>"""
+    if len(args) < 1:
+        print("Usage: list-tables <app_token>", file=sys.stderr)
+        sys.exit(1)
+    app_token = args[0]
+    uat = get_uat_token()
+    return api_call(f"bitable/v1/apps/{app_token}/tables", method="GET", token=uat)
+
+
+def cmd_list_records(args):
+    """list-records <app_token> <table_id> [page_size]"""
+    if len(args) < 2:
+        print("Usage: list-records <app_token> <table_id> [page_size]", file=sys.stderr)
+        sys.exit(1)
+    app_token = args[0]
+    table_id = args[1]
+    page_size = args[2] if len(args) >= 3 else "20"
+    uat = get_uat_token()
+    return api_call(
+        f"bitable/v1/apps/{app_token}/tables/{table_id}/records?page_size={page_size}",
+        method="GET",
+        token=uat,
+    )
+
+
+def cmd_create_record(args):
+    """create-record <app_token> <table_id> <fields_json>"""
+    if len(args) < 3:
+        print("Usage: create-record <app_token> <table_id> <fields_json>", file=sys.stderr)
+        sys.exit(1)
+    app_token = args[0]
+    table_id = args[1]
+    fields = json.loads(args[2])
+    uat = get_uat_token()
+    return api_call(
+        f"bitable/v1/apps/{app_token}/tables/{table_id}/records",
+        data={"fields": fields},
+        token=uat,
+    )
+
+
+def cmd_update_record(args):
+    """update-record <app_token> <table_id> <record_id> <fields_json>"""
+    if len(args) < 4:
+        print("Usage: update-record <app_token> <table_id> <record_id> <fields_json>", file=sys.stderr)
+        sys.exit(1)
+    app_token = args[0]
+    table_id = args[1]
+    record_id = args[2]
+    fields = json.loads(args[3])
+    uat = get_uat_token()
+    return api_call(
+        f"bitable/v1/apps/{app_token}/tables/{table_id}/records/{record_id}",
+        data={"fields": fields},
+        method="PUT",
+        token=uat,
+    )
+
+
+# --- Group Management (uses TAT) ---
+
+def cmd_create_group(args):
+    """create-group <name> [members_json]"""
+    if len(args) < 1:
+        print("Usage: create-group <name> [members_json]", file=sys.stderr)
+        sys.exit(1)
+    name = args[0]
+    members = json.loads(args[1]) if len(args) >= 2 else []
+    tat = get_tat()
+    body = {"name": name, "chat_type": "private"}
+    if members:
+        body["user_id_list"] = members
+    return api_call("im/v1/chats?user_id_type=open_id", data=body, token=tat)
+
+
+def cmd_add_members(args):
+    """add-members <chat_id> <members_json>"""
+    if len(args) < 2:
+        print("Usage: add-members <chat_id> <members_json>", file=sys.stderr)
+        sys.exit(1)
+    chat_id = args[0]
+    members = json.loads(args[1])
+    tat = get_tat()
+    return api_call(
+        f"im/v1/chats/{chat_id}/members?member_id_type=open_id",
+        data={"id_list": members},
+        token=tat,
+    )
+
+
+def cmd_list_groups(args):
+    """list-groups — List groups the bot is in"""
+    tat = get_tat()
+    return api_call("im/v1/chats?page_size=20", method="GET", token=tat)
 
 
 def send_message(receive_id, receive_id_type, msg_type, content):
@@ -300,6 +539,23 @@ def main():
         print("  get-msgs-user <open_id> [time] [count] Get DM history")
         print("  search-msgs <keyword> [time]         Search messages across chats")
         print("  get-thread <thread_id>               Get thread replies")
+        print()
+        print("Calendar / Meeting (UAT):")
+        print("  create-event <title> <start> <end> [attendees_json]  Create event with video meeting")
+        print("       start/end: ISO 8601 (2026-03-27T14:00:00+08:00) or unix timestamp")
+        print("       attendees_json: '[\"ou_xxx\",\"ou_yyy\"]' (optional)")
+        print("  list-events [date]                   List events (date: YYYY-MM-DD or 'today')")
+        print()
+        print("Bitable / Multi-dimensional Table (UAT):")
+        print("  list-tables <app_token>              List tables in a bitable app")
+        print("  list-records <app_token> <table_id> [page_size]  List records")
+        print("  create-record <app_token> <table_id> <fields_json>  Create a record")
+        print("  update-record <app_token> <table_id> <record_id> <fields_json>  Update a record")
+        print()
+        print("Group Management (TAT / bot identity):")
+        print("  create-group <name> [members_json]   Create a group chat")
+        print("  add-members <chat_id> <members_json> Add members to group")
+        print("  list-groups                          List groups the bot is in")
         print()
         print("Advanced:")
         print("  tools                                List all available MCP tools")
@@ -481,6 +737,36 @@ def main():
     elif cmd == "get-thread":
         # get-thread <thread_id>
         p(call_tool(token, token_type, "get-thread-messages", {"thread_id": sys.argv[2]}))
+
+    # --- Calendar / Meeting ---
+    elif cmd == "create-event":
+        p(cmd_create_event(sys.argv[2:]))
+
+    elif cmd == "list-events":
+        p(cmd_list_events(sys.argv[2:]))
+
+    # --- Bitable ---
+    elif cmd == "list-tables":
+        p(cmd_list_tables(sys.argv[2:]))
+
+    elif cmd == "list-records":
+        p(cmd_list_records(sys.argv[2:]))
+
+    elif cmd == "create-record":
+        p(cmd_create_record(sys.argv[2:]))
+
+    elif cmd == "update-record":
+        p(cmd_update_record(sys.argv[2:]))
+
+    # --- Group Management ---
+    elif cmd == "create-group":
+        p(cmd_create_group(sys.argv[2:]))
+
+    elif cmd == "add-members":
+        p(cmd_add_members(sys.argv[2:]))
+
+    elif cmd == "list-groups":
+        p(cmd_list_groups(sys.argv[2:]))
 
     # --- Raw call ---
     elif cmd == "call":
