@@ -29,6 +29,8 @@ If either is missing → guide the user through the [First-Time Setup](#first-ti
 
 ## First-Time Setup
 
+Tell the user: **"Setup takes about 5 minutes. I'll guide you step by step — just follow along and tell me when each step is done."**
+
 Before starting, ask the user:
 
 > Which features do you need?
@@ -58,6 +60,8 @@ docx:document:readonly,search:docs:read,wiki:wiki:readonly,im:chat:read,task:tas
 **Recommend the user to enable all permissions at once** (Choice 3) to avoid having to re-authorize later when they need more features. If the user prefers minimal permissions, show the corresponding choice.
 
 Guide the user to paste the string in the open platform → Permission Management → **Batch Import/Export**.
+
+**Important**: After batch importing, remind the user that some permissions (marked "needs approval" in the table below, such as `im:message.send_as_user`, `search:message`, `im:message.p2p_msg:get_as_user`, `im:message.group_msg:get_as_user`) require admin approval. While waiting for approval, all other features work normally — the user can start using docs, comments, calendar, and bitable right away.
 
 6 steps total. Confirm each step is done before moving to the next.
 
@@ -228,6 +232,19 @@ However, if the user wants a bot identity (e.g., to send automated notifications
 3. After approval, add the bot to target groups
 
 This step is entirely optional. If the user only needs to send messages as themselves, skip it.
+
+### Setup Complete!
+
+After all steps are done, congratulate the user and suggest trying these to verify everything works:
+
+> **You're all set! Try any of these to get started:**
+> - "Show me my Feishu/Lark documents"
+> - "Search for documents about [topic]"
+> - "Create a new document called [title]"
+> - "What meetings do I have today?"
+> - "Send a message to [name]: hello!"
+>
+> Just talk naturally — I'll handle the rest.
 
 ---
 
