@@ -55,7 +55,7 @@ Choice 3 (all features):
 docx:document:readonly,search:docs:read,wiki:wiki:readonly,im:chat:read,task:task:read,docx:document,docx:document:create,docx:document:write_only,docs:document.media:upload,docs:document.media:download,wiki:node:read,wiki:node:create,docs:document.comment:read,docs:document.comment:create,contact:user:search,contact:contact.base:readonly,contact:user.base:readonly,board:whiteboard:node:read,drive:drive,im:message,im:message:send_as_bot,im:chat,search:message,im:message.send_as_user,im:message.p2p_msg:get_as_user,im:message.group_msg:get_as_user,calendar:calendar:readonly,calendar:calendar,bitable:app:readonly,bitable:app,im:chat:create
 ```
 
-If the user doesn't want to choose or says "give me everything", show the Choice 3 (all features) string directly.
+**Recommend the user to enable all permissions at once** (Choice 3) to avoid having to re-authorize later when they need more features. If the user prefers minimal permissions, show the corresponding choice.
 
 Guide the user to paste the string in the open platform → Permission Management → **Batch Import/Export**.
 
